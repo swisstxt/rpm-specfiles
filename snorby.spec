@@ -1,27 +1,28 @@
 Name:           snorby
 Version:        2.5.6
-Release:        2%{?dist}
-Summary:        Snorby
-BuildArch:      x86_64
+Release:        5%{?dist}
+Summary:        Snorby web interface
+BuildArch:      noarch
 Group:          Application/Internet
 License:        GPLv3
 URL:            https://snorby.org
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires: ruby
-BuildRequires: gcc libxml2 ruby-devel libxml2-devel libxslt libxslt-devel
-#BuildRequires: qt-devel qtwebkit-devel
-#BuildRequires: libcurl-devel
+BuildRequires: opt-ruby-1.9.3 opt-ruby-1.9.3-rubygem-bundler
+BuildRequires: gcc libxml2 libxml2-devel libxslt libxslt-devel
 
-%define git_repo https://github.com/Snorby/snorby.git
+Requires: opt-ruby-1.9.3 opt-ruby-1.9.3-rubygem-bundler
+Requires: ImageMagick wkhtmltopdf
+
+%define git_repo https://github.com/Snorby/%{name}.git
 %define appdir /var/www/vhosts/%{name}
-%define configdir %{appdir}/config
+%define cfgdir %{appdir}/config
 %define logdir %{appdir}/log
 %define tmpdir %{appdir}/tmp
 
 
 %description
-Snorby - Snort web interface
+Snorby web interface
 
 
 %prep
@@ -34,16 +35,24 @@ popd
 
 %build
 pushd %{name}
-  bundle install --deployment
+  # install all dependencies via bundler
+  /opt/ruby-1.9.3/bin/bundle install --deployment --shebang=/opt/ruby-1.9.3/bin/ruby
 
+  # install bundler itself
   cat <<-EOD > gemrc
-    gemhome: $PWD/vendor/bundle/ruby/1.9.3
+    gemhome: $PWD/vendor/bundle/ruby/1.9.1
     gempath:
-    - $PWD/vendor/bundle/ruby/1.9.3
+    - $PWD/vendor/bundle/ruby/1.9.1
 EOD
-
-  gem --config-file ./gemrc install bundler
+  /opt/ruby-1.9.3/bin/gem --config-file ./gemrc install bundler
   rm ./gemrc
+
+  # correct shebangs for opt-ruby
+  egrep -rl '#!/usr/bin/env ruby' . \
+  | xargs sed -ri 's@#!/usr/bin/env ruby@#!/opt/ruby-1.9.3/bin/ruby@g'
+
+  egrep -rl '#!/usr/local/bin/ruby' . \
+  | xargs sed -ri 's@#!/usr/local/bin/ruby@#!/opt/ruby-1.9.3/bin/ruby@g'
 popd
 
 
@@ -52,14 +61,15 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/%{appdir}
 mkdir -p $RPM_BUILD_ROOT/%{logdir}
 mkdir -p $RPM_BUILD_ROOT/%{tmpdir}
-mkdir -p $RPM_BUILD_ROOT/%{configdir}
 
 pushd %{name}
-  mv * $RPM_BUILD_ROOT/%{appdir}
+  mv * .bundle $RPM_BUILD_ROOT/%{appdir}
 popd
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
+
 
 %files
 %defattr(-,root,root,-)
