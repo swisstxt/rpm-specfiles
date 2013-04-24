@@ -1,0 +1,98 @@
+From 00a006511b4b46298ac6cdebbeabb48d65d94ae8 Mon Sep 17 00:00:00 2001
+From: emboss <emboss@b2dd03c8-39d4-4d8f-98ff-823fe69b080e>
+Date: Fri, 22 Jul 2011 02:21:26 +0000
+Subject: [PATCH] * ext/openssl/ossl_digest.c: Check return value of
+ EVP_DigestInit_ex. * ext/openssl/ossl_hmac.c: Check return
+ value of HMAC_Init_ex.   Thanks, Jared Jennings, for the
+ patch.   [ Ruby 1.9 - Bug #4944 ] [ruby-core:37670]
+
+git-svn-id: svn+ssh://ci.ruby-lang.org/ruby/trunk@32606 b2dd03c8-39d4-4d8f-98ff-823fe69b080e
+---
+ ChangeLog                 |    7 +++++++
+ ext/openssl/ossl_digest.c |   12 +++++++++---
+ ext/openssl/ossl_hmac.c   |   10 +++++++---
+ 3 files changed, 23 insertions(+), 6 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 610e490..771b314 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,10 @@
++Fri Jul 22 11:20:20 2011  Martin Bosslet  <Martin.Bosslet@googlemail.com>
++
++	* ext/openssl/ossl_digest.c: Check return value of EVP_DigestInit_ex.
++	* ext/openssl/ossl_hmac.c: Check return value of HMAC_Init_ex.
++	  Thanks, Jared Jennings, for the patch.
++	  [ Ruby 1.9 - Bug #4944 ] [ruby-core:37670]
++
+ Thu Jun 30 12:52:56 2011  WATANABE Hirofumi  <eban@ruby-lang.org>
+ 
+ 	* ext/tk/extconf.rb (intptr_t, uintptr_t): support for the latest ActiveTcl with mingw.
+diff --git a/ext/openssl/ossl_digest.c b/ext/openssl/ossl_digest.c
+index cb0cade..ab165c4 100644
+--- a/ext/openssl/ossl_digest.c
++++ b/ext/openssl/ossl_digest.c
+@@ -62,7 +62,9 @@ ossl_digest_new(const EVP_MD *md)
+ 
+     ret = ossl_digest_alloc(cDigest);
+     GetDigest(ret, ctx);
+-    EVP_DigestInit_ex(ctx, md, NULL);
++    if (EVP_DigestInit_ex(ctx, md, NULL) != 1) {
++	ossl_raise(eDigestError, "Digest initialization failed.");
++    }
+    
+     return ret;
+ }
+@@ -104,7 +106,9 @@ ossl_digest_initialize(int argc, VALUE *argv, VALUE self)
+     if (!NIL_P(data)) StringValue(data);
+ 
+     GetDigest(self, ctx);
+-    EVP_DigestInit_ex(ctx, md, NULL);
++    if (EVP_DigestInit_ex(ctx, md, NULL) != 1) {
++	ossl_raise(eDigestError, "Digest initialization failed.");
++    }
+     
+     if (!NIL_P(data)) return ossl_digest_update(self, data);
+     return self;
+@@ -138,7 +142,9 @@ ossl_digest_reset(VALUE self)
+     EVP_MD_CTX *ctx;
+ 
+     GetDigest(self, ctx);
+-    EVP_DigestInit_ex(ctx, EVP_MD_CTX_md(ctx), NULL);
++    if (EVP_DigestInit_ex(ctx, EVP_MD_CTX_md(ctx), NULL) != 1) {
++	ossl_raise(eDigestError, "Digest initialization failed.");
++    }
+ 
+     return self;
+ }
+diff --git a/ext/openssl/ossl_hmac.c b/ext/openssl/ossl_hmac.c
+index 15b37d0..5d29b8f 100644
+--- a/ext/openssl/ossl_hmac.c
++++ b/ext/openssl/ossl_hmac.c
+@@ -70,8 +70,10 @@ ossl_hmac_initialize(VALUE self, VALUE key, VALUE digest)
+ 
+     StringValue(key);
+     GetHMAC(self, ctx);
+-    HMAC_Init_ex(ctx, RSTRING_PTR(key), RSTRING_LEN(key),
+-		 GetDigestPtr(digest), NULL);
++    if (HMAC_Init_ex(ctx, RSTRING_PTR(key), RSTRING_LEN(key),
++		 GetDigestPtr(digest), NULL) != 1) {
++	ossl_raise(eHMACError, "HMAC initialization failed.");
++    }
+ 
+     return self;
+ }
+@@ -179,7 +181,9 @@ ossl_hmac_reset(VALUE self)
+     HMAC_CTX *ctx;
+ 
+     GetHMAC(self, ctx);
+-    HMAC_Init_ex(ctx, NULL, 0, NULL, NULL);
++    if (HMAC_Init_ex(ctx, NULL, 0, NULL, NULL) != 1) {
++	ossl_raise(eHMACError, "HMAC initialization failed");
++    }
+ 
+     return self;
+ }
+-- 
+1.7.6
+

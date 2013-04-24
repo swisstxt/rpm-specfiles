@@ -1,0 +1,145 @@
+/* Systemtap tapset to make it easier to trace Ruby */
+
+/**
+ * probe ruby.function.entry - Ruby method entry
+ *
+ * @classname: String containing class name
+ * @methodname: String containing method name
+ * @file: Source file of invoked method
+ * @line: Line number of the method
+ */
+probe ruby.function.entry = 
+      process("LIBRARY_PATH").mark("function__entry")
+{
+	classname  = user_string($arg1)
+	methodname = user_string($arg2)
+	file = user_string($arg3)
+	line = $arg4
+}
+
+/**
+ * probe ruby.function.return -Ruby method return
+ *
+ * @classname: String containing class name
+ * @methodname: String containing method name
+ * @file: Source file of invoked method
+ * @line: Line number of the method
+ */
+probe ruby.function.return = 
+      process("LIBRARY_PATH").mark("function__return")
+{
+	classname  = user_string($arg1)
+	methodname = user_string($arg2)
+	file = user_string($arg3)
+	line = $arg4
+}
+
+/**
+ * probe ruby.gc.begin - Start Ruby garbage collection
+ *
+ */
+probe ruby.gc.begin =
+      process("LIBRARY_PATH").mark("gc__begin")
+{
+}
+
+/**
+ * probe ruby.gc.end -  Finish Ruby garbage collection
+ *
+ */
+probe ruby.gc.end = process("LIBRARY_PATH").mark("gc__end")
+{
+}
+
+/**
+ * probe ruby.line - Show location of executed statement
+ *
+ * @file: Source file of executed statement
+ * @line: Line number of executed statement
+ */
+probe ruby.line =
+      process("LIBRARY_PATH").mark("line")
+{
+	file = user_string($arg1)
+	line = $arg2
+}
+
+/**
+ * probe ruby.object.create.start - Object creation started
+ *
+ * @classname: Class being created
+ * @file: Source file of new statement
+ * @line: Line number of new statement
+ */
+probe ruby.object.create.start =
+      process("LIBRARY_PATH").mark("object__create__start")
+{
+	classname  = user_string($arg1)
+	file = user_string($arg2)
+	line = $arg3
+}
+
+/**
+ * probe ruby.object.create.done - Object creation completed
+ *
+ * @classname: Class being created
+ * @file: Source file of new statement
+ * @line: Line number of new statement
+ */
+probe ruby.object.create.done =
+      process("LIBRARY_PATH").mark("object__create__done")
+{
+	classname  = user_string($arg1)
+	file = user_string($arg2)
+	line = $arg3
+}
+
+/**
+ * probe ruby.object.free -
+ *
+ * @classname: Class of object being freed
+ */
+probe ruby.object.free =
+      process("LIBRARY_PATH").mark("object__free")
+{
+	classname  = user_string($arg1)
+}
+
+/**
+ * probe ruby.raise - Raise an exception
+ *
+ * @classname: Class of exception
+ * @file: Source file where exception occurred
+ * @line: Line number where exception occurred
+ */
+probe ruby.raise = process("LIBRARY_PATH").mark("raise")
+{
+	classname  = user_string($arg1)
+	file = user_string($arg2)
+	line = $arg3
+}
+
+/**
+ * probe ruby.rescue - rescue clause handling an exception
+ *
+ * @file: Source file of rescue clause
+ * @line: Line number of rescue clause
+ */
+probe ruby.rescue = process("LIBRARY_PATH").mark("rescue")
+{
+	file = user_string($arg1)
+	line = $arg2
+}
+
+/**
+ * probe ruby.ruby__probe - Ruby dynamic probe
+ *
+ * @probe_point: Name of the dynamic probe
+ * @probe_data: Data string for dynamic probe
+ */
+probe ruby.ruby__probe =
+      process("LIBRARY_PATH").mark("ruby__probe")
+{
+	probe_point = user_string($arg1)
+	probe_data = user_string($arg2)
+}

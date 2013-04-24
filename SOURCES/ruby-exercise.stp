@@ -1,0 +1,37 @@
+probe ruby.function.entry {
+  printf("%d -> %s::%s %s:%d\n", tid(), classname, methodname, file, line);
+}
+
+probe ruby.function.return {
+  printf("%d <- %s::%s %s:%d\n", tid(), classname, methodname, file, line);
+}
+
+probe ruby.gc.begin { printf("%d gc.begin\n", tid()); }
+
+probe ruby.gc.end { printf("%d gc.end\n", tid()); }
+
+probe ruby.line { printf("%d %s:%d\n", tid(), file, line); }
+
+probe ruby.object.create.start {
+  printf("%d obj.create.start %s %s:%d\n", tid(), classname, file, line);
+}
+
+probe ruby.object.create.done {
+  printf("%d obj.create.done %s %s:%d\n", tid(), classname, file, line);
+}
+
+probe ruby.object.free {
+  printf("%d obj.free %\sn", tid(), classname);
+}
+
+probe ruby.raise {
+  printf("%d raise %s %s:%d\n", tid(), classname, file, line);
+}
+
+probe ruby.rescue {
+  printf("%d rescue %s:%d\n", tid(), file, line);
+}
+
+probe ruby.ruby__probe {
+  printf("%d probe %s %s\n", tid(), probe_point, probe_data);
+}

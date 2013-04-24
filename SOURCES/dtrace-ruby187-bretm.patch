@@ -1,0 +1,34 @@
+--- ./Makefile.in.187	2011-01-14 14:04:52.535618264 -0500
++++ ./Makefile.in	2011-01-14 14:24:16.990487819 -0500
+@@ -107,18 +107,18 @@ all:
+ 
+ miniruby$(EXEEXT):
+ 		@$(RM) $@
+-		$(PURIFY) $(CC) $(LDFLAGS) $(XLDFLAGS) $(MAINLIBS) $(MAINOBJ) $(MINIOBJS) $(LIBRUBY_A) $(DTRACE_OBJS) $(LIBS) $(OUTFLAG)$@
++		$(PURIFY) $(CC) $(LDFLAGS) $(XLDFLAGS) $(MAINLIBS) $(MAINOBJ) $(MINIOBJS) $(LIBRUBY_A) $(LIBS) $(OUTFLAG)$@
+ 
+ $(PROGRAM):
+ 		@$(RM) $@
+-		$(PURIFY) $(CC) $(LDFLAGS) $(XLDFLAGS) $(MAINLIBS) $(MAINOBJ) $(EXTOBJS) $(LIBRUBYARG) $(DTRACE_OBJS) $(LIBS) $(OUTFLAG)$@
++		$(PURIFY) $(CC) $(LDFLAGS) $(XLDFLAGS) $(MAINLIBS) $(MAINOBJ) $(EXTOBJS) $(LIBRUBYARG) $(LIBS) $(OUTFLAG)$@
+ 
+ # We must `rm' the library each time this rule is invoked because "updating" a
+ # MAB library on Apple/NeXT (see --enable-fat-binary in configure) is not
+ # supported.
+ $(LIBRUBY_A):
+ 		@$(RM) $@
+-		$(AR) $(ARFLAGS) $@ $(OBJS) $(DMYEXT)
++		$(AR) $(ARFLAGS) $@ $(OBJS) $(DTRACE_OBJS) $(DMYEXT)
+ 		@-$(RANLIB) $@ 2> /dev/null || true
+ 
+ $(LIBRUBY_SO):
+@@ -201,6 +201,9 @@ ext/extinit.$(OBJEXT): ext/extinit.c $(S
+ $(DTRACE_HEADER): dtrace.d $(OBJS)
+ 	/usr/bin/dtrace -h -s dtrace.d
+ 
++$(DTRACE_OBJS): dtrace.d $(OBJS) $(MAINOBJ)
++	/usr/bin/dtrace -G -o dtrace.o -s dtrace.d $(OBJS)
++
+ update-rubyspec: 
+ 	if [ -d $(srcdir)/rubyspec ]; then \
+ 	  cd $(srcdir)/rubyspec/mspec; \

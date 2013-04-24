@@ -1,0 +1,57 @@
+From dfaf61504c3ae4f7d4a7f8dea2d853faba33fbee Mon Sep 17 00:00:00 2001
+From: nobu <nobu@b2dd03c8-39d4-4d8f-98ff-823fe69b080e>
+Date: Mon, 8 Dec 2008 18:21:47 +0000
+Subject: [PATCH] * mkconfig.rb: fix for continued lines.  based on a patch
+ from   Marcus Rueckert <darix AT opensu.se> at
+ [ruby-core:20420].
+
+git-svn-id: svn+ssh://ci.ruby-lang.org/ruby/branches/ruby_1_8@20587 b2dd03c8-39d4-4d8f-98ff-823fe69b080e
+---
+ ChangeLog   |    5 +++++
+ mkconfig.rb |   11 +++++------
+ version.h   |    6 +++---
+ 3 files changed, 13 insertions(+), 9 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index b1b9022..7e06082 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -2099,6 +2099,11 @@
+ 
+ 	* test/rss/: use PNG instead of zlib as binary data. [ruby-dev:35666]
+ 
++Tue Dec  9 03:21:37 2008  Nobuyoshi Nakada  <nobu@ruby-lang.org>
++
++	* mkconfig.rb: fix for continued lines.  based on a patch from
++	  Marcus Rueckert <darix AT opensu.se> at [ruby-core:20420].
++
+ Tue Nov 11 01:07:32 2008  Kazuhiro NISHIYAMA  <zn@mbf.nifty.com>
+ 
+ 	* configure.in: fix SEGV on Mac OS X 10.5.3 with --enable-pthread.
+diff --git a/mkconfig.rb b/mkconfig.rb
+index d360251..de37a7e 100755
+--- a/mkconfig.rb
++++ b/mkconfig.rb
+@@ -57,14 +57,13 @@ File.foreach "config.status" do |line|
+       continued_name = name
+       next
+     end
+-  when /^"(.+)"\s*(\\)?$/
++  when /^"(.*)"\s*(\\)?$/
+     if continued_line
+       continued_line <<  $1
+-      unless $2
+-	val = continued_line.join("")
+-	name = continued_name
+-	continued_line = nil
+-      end
++      next if $2
++      val = continued_line.join("")
++      name = continued_name
++      continued_line = nil
+     end
+   when /^(?:ac_given_)?INSTALL=(.*)/
+     v_fast << "  CONFIG[\"INSTALL\"] = " + $1 + "\n"
+-- 
+1.7.6
+
