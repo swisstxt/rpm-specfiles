@@ -1,5 +1,5 @@
 %define rubyver         1.9.3
-%define rubyminorver    p194
+%define rubyminorver    p392
 
 %define _prefix		/opt/ruby-%{rubyver}
 %define _localstatedir	/opt/ruby-%{rubyver}/var
