@@ -1,6 +1,6 @@
 Version: 2.1.5
 Name: pakiti
-Release: 1
+Release: 3
 
 License: BSD
 Source: http://pakiti.sourceforge.net/rpms/%{name}/%{name}-%{version}.tar.gz
@@ -208,3 +208,4 @@ echo "See README file in /usr/share/doc/pakiti-client-2.1/"
 
 %preun server
 /sbin/chkconfig --level 234 pakiti2 off
+
