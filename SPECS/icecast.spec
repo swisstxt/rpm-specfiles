@@ -1,7 +1,7 @@
 Name:		icecast
-Version:	2.3.3
-Release:	1
-Summary:	Xiph Streaming media server that supports multiple audio formats. KH-Build
+Version:	2.3.3kh7
+Release:	2
+Summary:	Xiph Streaming media server that supports multiple audio formats. KH-Build7
 
 Group:		Applications/Multimedia
 License:	GPL
@@ -34,10 +34,12 @@ easily and supports open standards for commuincation and interaction.
 %prep
 rm -rf %{name}
 git clone %{git_repo} %{name}
+cd %{name}
+git checkout icecast-2.3.3-kh7
 
 %build
 cd %{name}
-CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{_prefix} --mandir=%{_mandir} --sysconfdir=/etc
+CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{_prefix} --sysconfdir=/etc
 make
 
 %install

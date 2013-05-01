@@ -1,7 +1,7 @@
 Name:           geostream
-Version:        0.1.6
+Version:        0.2.0
 Release:        1%{?dist}
-Summary:        Geostream - Audiostreaming GEO-IP API
+Summary:        Geostream - Audiostreaming GeoIP API
 BuildArch:      x86_64
 Group:          Application/Internet
 License:        commercial
@@ -21,7 +21,7 @@ Requires: libxml2 libxslt
 %define tmpdir %{appdir}/tmp
 
 %description
-Geostream - Audiostreaming GEO-IP API
+Geostream - Audiostreaming GeoIP API
 
 %prep
 rm -rf %{name}
@@ -77,6 +77,6 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %{appdir}
-%attr(755,geostream,geostream) %{logdir}
-%attr(755,geostream,geostream) %{tmpdir}
+%attr(755,root,root) %{logdir}
+%attr(755,root,root) %{tmpdir}
 %doc
