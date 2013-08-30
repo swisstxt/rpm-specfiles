@@ -9,8 +9,8 @@
 %global  nginx_webroot       %{nginx_datadir}/html
 
 Name:              nginx-pcache
-Version:           1.0.15
-Release:           3%{?dist}
+Version:           1.4.2
+Release:           1%{?dist}
 
 Summary:           A high performance web server and reverse proxy server
 Group:             System Environment/Daemons
@@ -27,8 +27,8 @@ Source4:           default.conf
 Source5:           ssl.conf
 Source6:           virtual.conf
 Source7:           nginx.sysconfig
-source8:           ngx_cache_purge-2.0.tar.gz
-source9:           nginx-udplog-module-1.0.0c.tar.gz
+source8:           ngx_cache_purge-2.1.tar.gz
+source9:           nginx_udplog_module-1.0.0c.tar.gz
 Source100:         index.html
 Source101:         poweredby.png
 Source102:         nginx-logo.png
@@ -116,7 +116,7 @@ export DESTDIR=%{buildroot}
     --with-mail_ssl_module \
     --with-cc-opt="%{optflags} $(pcre-config --cflags)" \
     --with-ld-opt="-Wl,-E" \
-    --add-module=%{_builddir}/%{real_name}-%{version}/ngx_cache_purge-2.0 \
+    --add-module=%{_builddir}/%{real_name}-%{version}/ngx_cache_purge-2.1 \
     --add-module=%{_builddir}/%{real_name}-%{version}/nginx-udplog-module-1.0.0c
 
 make %{?_smp_mflags} 
@@ -217,6 +217,9 @@ fi
 
 
 %changelog
+* Tue Aug 30 2013 Rene Moser <rene.moser@swisstxt.ch> - 1.4.2-1
+- custom build for pcache environment
+
 * Tue Jan 16 2013 Simon Josi <simon.josi@swisstxt.ch> - 1.0.15-3
 - custom build for pcache environment
 
